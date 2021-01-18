@@ -1,22 +1,19 @@
 import React from 'react';
 import { Popconfirm, Table, Space, Button } from 'antd';
-import EditCampaign from '../Campaigns/EditCampaign';
-import AdminComments from '../Comments/AdminComments';
+import EditComments from './EditComments';
+import { stringify } from 'querystring';
 
-const URL = "http://localhost:4000/campaigns/"
+const URL = "http://localhost:4000/comments/"
 
 interface FetchTypes {
    selectedRow: {
-      title: string,
-      description: string,
-      videoURL: string,
-      endDate: string,
+      pageID: number,
+      commentText: string,
       id: number,
-      softCap: number
    }
 }
 
-class AdminContent extends React.Component <FetchTypes> {
+class AdminComments extends React.Component  {
 
    state = {
       data: [],
@@ -24,22 +21,19 @@ class AdminContent extends React.Component <FetchTypes> {
          current: 1,
          pageSize: 10,
       },
-      loading: false,
+      // loading: false,
       visible: false,
       sessionToken: '',
       selectedRow: {
-         title: '',
-         description: '',
-         videoURL: '',
-         endDate: '',
+         pageID: 0,
+         commentText: '',
          id: 0,
-         softCap: 0
       },
       columns: [
          {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
+            title: 'Campaign ID',
+            dataIndex: 'pageID',
+            key: 'pageID',
             render: (text: string) => <a>{text}</a>,
          },
          {
@@ -48,9 +42,9 @@ class AdminContent extends React.Component <FetchTypes> {
             key: 'id',
          },
          {
-            title: 'User ID',
-            dataIndex: 'userID',
-            key: 'userID',
+            title: 'Comment Text',
+            dataIndex: 'commentText',
+            key: 'commentText',
          },
          {
             title: 'Date Created',
@@ -63,7 +57,7 @@ class AdminContent extends React.Component <FetchTypes> {
             render: (text: {id: number}) => (
                <Space size="middle">
                   <Button onClick={(e: React.MouseEvent) => this.showDrawers(e, text)}>Update ID{text.id}</Button>
-                  <Popconfirm title="Are you sure you want to delete this campaign？" okText="Yes" cancelText="No">
+                  <Popconfirm title="Are you sure you want to delete this comment？" okText="Yes" cancelText="No">
                      <Button onClick={(e: React.MouseEvent) => this.changeSelectedRow(e, text)} type="primary">
                         Delete
                      </Button>
@@ -120,19 +114,17 @@ class AdminContent extends React.Component <FetchTypes> {
    }
 
    render() {
-      const { data, pagination, loading } = this.state;
+      const { data, pagination } = this.state;
       return (
          <React.Fragment>
             <Table
                columns={this.state.columns}
                dataSource={data}
             />
-            <EditCampaign sessionToken={this.state.sessionToken} visible={this.state.visible} selectedRow={this.state.selectedRow} onClose={this.onClose} showDrawers={this.showDrawers} />
-            <br/>
-            <AdminComments />
+            <EditComments sessionToken={this.state.sessionToken} visible={this.state.visible} selectedRow={this.state.selectedRow} onClose={this.onClose} showDrawers={this.showDrawers} />
          </React.Fragment>
       );
    }
 }
 
-export default AdminContent;
+export default AdminComments;
