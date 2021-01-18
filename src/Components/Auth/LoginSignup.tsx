@@ -1,16 +1,35 @@
 import React from "react";
 import { Drawer, Form, Button, Col, Row, Input, Radio } from 'antd';
+import {withRouter} from 'react-router-dom';
+import {RouteComponentProps} from 'react-router';
 // import { ExclamationOutlined } from "@ant-design/icons";
 
 // const { Option } = Select;
 
+type PathParamsType = {
+   param1: string,
+}
+
+// Your component own properties
+type PropsType = RouteComponentProps<PathParamsType> & {
+   history: string,
+   updateToken: (token: string) => void
+   setAdmin: (userType: string) => void
+   onLogout: () => void
+   sessionToken: string
+}
+
 const URL = "http://localhost:4000/"
 
-interface TokenProps {
-   updateToken: (token: string) => void
- }
+// interface TokenProps {
+//    updateToken: (token: string) => void
+//    setAdmin: (userType: string) => void
+//    onLogout: () => void
+//    sessionToken: string
+//    someString: string
+//  }
 
-class LoginSignup extends React.Component <TokenProps> {
+class LoginSignup extends React.Component <PropsType> {
    state = {
       visible: false,
       isLoggedIn: "login",
@@ -23,6 +42,13 @@ class LoginSignup extends React.Component <TokenProps> {
          visible: true,
       });
    };
+
+   logoutFunction = () => {
+      localStorage.removeItem('token')
+      localStorage.removeItem('userType')
+      this.props.setAdmin('user')
+      this.props.onLogout()
+   }
 
    onClose = () => {
       this.setState({
@@ -49,6 +75,14 @@ class LoginSignup extends React.Component <TokenProps> {
         }).then((response) => response.json()
         ).then((data) => {
             this.props.updateToken(data.accessToken);
+            if (data.user.role === "admin") {
+               localStorage.setItem("userType", "admin")
+               this.props.setAdmin('admin')
+            } else {
+               localStorage.removeItem('userType')
+               this.props.setAdmin('user')
+               this.props.history.push('/')
+            }
             console.log(data);
         })
       this.setState({
@@ -59,9 +93,13 @@ class LoginSignup extends React.Component <TokenProps> {
    render() {
       return (
          <>
-            <Button type="primary" onClick={this.showDrawer} style={{ float: 'right', margin: '16px' }}>
+            { this.props.sessionToken ? 
+            <Button type="primary" onClick={this.logoutFunction} style={{ float: 'right', margin: '16px' }}>
+               Logout
+            </Button>
+            : <Button type="primary" onClick={this.showDrawer} style={{ float: 'right', margin: '16px' }}>
                Login/Signup
-        </Button>
+            </Button> }
             <Drawer
                title={
                   <Radio.Group value={this.state.isLoggedIn} style={{ marginLeft: '40%' }} onChange={this.changeLoginSignup} >
@@ -114,4 +152,4 @@ class LoginSignup extends React.Component <TokenProps> {
    }
 }
 
-export default LoginSignup;
+export default withRouter(LoginSignup);
