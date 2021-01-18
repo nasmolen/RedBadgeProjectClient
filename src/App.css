@@ -1,6 +1,6 @@
-@import 'antd/dist/antd.css';
+@import 'antd/dist/antd.dark.css';
 
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -37,7 +37,7 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */
 
 .trigger {
   font-size: 18px;
@@ -57,6 +57,6 @@
   margin-bottom: 8px;
 }
 
-.site-layout .site-layout-background {
+/* .site-layout .site-layout-background {
   background: #fff;
-}
+} */
