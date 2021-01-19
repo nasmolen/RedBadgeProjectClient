@@ -1,7 +1,7 @@
 import React from "react";
 import { Drawer, Form, Button, Col, Row, Input, Radio } from 'antd';
-import {withRouter} from 'react-router-dom';
-import {RouteComponentProps} from 'react-router';
+import { withRouter } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router';
 // import { ExclamationOutlined } from "@ant-design/icons";
 
 // const { Option } = Select;
@@ -29,7 +29,7 @@ const URL = "http://localhost:4000/"
 //    someString: string
 //  }
 
-class LoginSignup extends React.Component <PropsType> {
+class LoginSignup extends React.Component<PropsType> {
    state = {
       visible: false,
       isLoggedIn: "login",
@@ -58,22 +58,23 @@ class LoginSignup extends React.Component <PropsType> {
 
    changeLoginSignup = () => {
       this.state.isLoggedIn === "login" ? this.setState({
-         isLoggedIn:  "signup",
+         isLoggedIn: "signup",
       }) : this.setState({
-         isLoggedIn:  "login",
+         isLoggedIn: "login",
       })
    }
 
    handleSubmit = (e: React.MouseEvent) => {
-      e.preventDefault(); 
-        fetch(URL + this.state.isLoggedIn, {
+      e.preventDefault();
+      if (this.state.isLoggedIn === 'login') {
+         fetch(URL + this.state.isLoggedIn, {
             method: 'POST',
-            body: JSON.stringify({ email: this.state.email, password: this.state.password}),
+            body: JSON.stringify({ email: this.state.email, password: this.state.password }),
             headers: new Headers({
-                'Content-Type': 'application/json'
+               'Content-Type': 'application/json'
             })
-        }).then((response) => response.json()
-        ).then((data) => {
+         }).then((response) => response.json()
+         ).then((data) => {
             this.props.updateToken(data.accessToken);
             if (data.user.role === "admin") {
                localStorage.setItem("userType", "admin")
@@ -84,22 +85,37 @@ class LoginSignup extends React.Component <PropsType> {
                this.props.history.push('/')
             }
             console.log(data);
-        })
-      this.setState({
-         visible: false,
-      });
-   };
+         })
+         this.setState({
+            visible: false,
+         });
+      } else {
+         fetch(URL + this.state.isLoggedIn, {
+            method: 'POST',
+            body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+            headers: new Headers({
+               'Content-Type': 'application/json'
+            })
+         }).then((response) => response.json()
+         ).then((data) => {
+            this.props.updateToken(data.accessToken);
+         });
+         this.setState({
+            visible: false,
+         });
+      };
+   }
 
    render() {
       return (
          <>
-            { this.props.sessionToken ? 
-            <Button type="primary" onClick={this.logoutFunction} style={{ float: 'right', margin: '16px' }}>
-               Logout
+            { this.props.sessionToken ?
+               <Button type="primary" onClick={this.logoutFunction} style={{ float: 'right', margin: '16px' }}>
+                  Logout
             </Button>
-            : <Button type="primary" onClick={this.showDrawer} style={{ float: 'right', margin: '16px' }}>
-               Login/Signup
-            </Button> }
+               : <Button type="primary" onClick={this.showDrawer} style={{ float: 'right', margin: '16px' }}>
+                  Login/Signup
+            </Button>}
             <Drawer
                title={
                   <Radio.Group value={this.state.isLoggedIn} style={{ marginLeft: '40%' }} onChange={this.changeLoginSignup} >
@@ -119,7 +135,7 @@ class LoginSignup extends React.Component <PropsType> {
                            label="Email"
                            rules={[{ required: true, message: 'Please enter user name' }]}
                         >
-                           <Input placeholder="Please enter your email" value={this.state.email} onChange={(e) => {this.setState ({email: e.target.value})}} />
+                           <Input placeholder="Please enter your email" value={this.state.email} onChange={(e) => { this.setState({ email: e.target.value }) }} />
                         </Form.Item>
                      </Col>
                      <Col span={12}>
@@ -128,10 +144,10 @@ class LoginSignup extends React.Component <PropsType> {
                            label="Password"
                            rules={[{ required: true, message: 'Please enter your password' }]}
                         >
-                           <Input.Password placeholder="Please enter your password" value={this.state.password} onChange={(e) => {this.setState ({password: e.target.value})}} />
+                           <Input.Password placeholder="Please enter your password" value={this.state.password} onChange={(e) => { this.setState({ password: e.target.value }) }} />
                         </Form.Item>
                      </Col>
-         
+
                   </Row>
                   <div
                      style={{
